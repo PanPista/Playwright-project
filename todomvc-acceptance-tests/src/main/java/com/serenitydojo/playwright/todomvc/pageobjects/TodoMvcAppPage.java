@@ -12,6 +12,10 @@ public class TodoMvcAppPage {
     private final String baseUrl;
     private final Locator todoItems;
     private final Locator inputField;
+    private final Locator todoCount;
+    private final Locator clearCompletedButton;
+
+    public static final String TODO_INPUT_PLACEHOLDER = "What needs to be done?";
 
     public TodoMvcAppPage(Page page) {
         this.page = page;
@@ -19,6 +23,8 @@ public class TodoMvcAppPage {
 
         todoItems = page.getByTestId("todo-item");
         inputField = page.getByTestId("text-input");
+        todoCount = page.getByTestId("footer").locator(".todo-count");
+        clearCompletedButton = page.getByTestId("footer").locator(".clear-completed");
     }
 
     public void open() {
@@ -51,10 +57,31 @@ public class TodoMvcAppPage {
     }
 
     public void deleteTodoItem(String itemText) {
-        Locator item = todoItems.filter(new Locator.FilterOptions().setHasText(itemText)).first();
+        Locator item = getTodoItem(itemText);
         Locator deleteButton = item.getByTestId("todo-item-button");
         item.hover();
         deleteButton.click();
     }
 
+    public void completeTodoItem(String itemText) {
+        Locator item = getTodoItem(itemText);
+        Locator checkbox = item.getByTestId("todo-item-toggle");
+        checkbox.check();
+    }
+
+    public Locator getTodoItem(String itemText) {
+        return todoItems.filter(new Locator.FilterOptions().setHasText(itemText)).first();
+    }
+
+    public Locator getTodoCount() {
+        return todoCount;
+    }
+
+    public Locator getClearCompletedButton() {
+        return clearCompletedButton;
+    }
+
+    public void clearCompletedItems() {
+        clearCompletedButton.click();
+    }
 }

@@ -13,26 +13,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+import static com.serenitydojo.playwright.data.TodoData.*;
+
 
 @DisplayName("Adding and deleting todo items to the list")
 @Feature("Adding and deleting todo items to the list")
 @UsePlaywright(ChromeHeadlessOptions.class)
 class AddingAndDeletingTodoItemsTest {
 
-    private static final String FEED_THE_CAT = "Feed the cat";
-    private static final String WALK_THE_DOG = "Walk the dog";
-    private static final String BUY_SOME_MILK = "Buy some milk";
-    private static final String FEED_THE_CAT_IN_CHINESE = "喂猫";
-    private static final String FEED_THE_CAT_IN_ARABIC = "إطعام القط";
-    private static final String EMPTY_TODO = "";
-    private static final String TODO_INPUT_PLACEHOLDER = "What needs to be done?";
     TodoMvcAppPage todoMvcApp;
-
-    private static final String[] INITIAL_ITEMS = {FEED_THE_CAT, WALK_THE_DOG, BUY_SOME_MILK};
-    private static final String[] DUPLICATE_ITEMS = {FEED_THE_CAT, WALK_THE_DOG, FEED_THE_CAT};
-    private static final String[] NON_ENGLISH_ITEMS = {
-            FEED_THE_CAT, FEED_THE_CAT_IN_CHINESE, FEED_THE_CAT_IN_ARABIC
-    };
 
     @BeforeEach
     void openApp(Page page) {
@@ -59,7 +48,7 @@ class AddingAndDeletingTodoItemsTest {
             // 1) Verify that the input field is visible
             // 2) Verify that the placeholder text is "What needs to be done?"
             assertThat(todoMvcApp.getInputField()).isVisible();
-            assertThat(todoMvcApp.getInputField()).hasAttribute("placeholder", TODO_INPUT_PLACEHOLDER);
+            assertThat(todoMvcApp.getInputField()).hasAttribute("placeholder", TodoMvcAppPage.TODO_INPUT_PLACEHOLDER);
         }
     }
 
@@ -132,6 +121,11 @@ class AddingAndDeletingTodoItemsTest {
     @Nested
     class WhenDeletingItems {
 
+        @BeforeEach
+        void addInitialItems() {
+            todoMvcApp.addTodoItems(INITIAL_ITEMS);
+        }
+
         @DisplayName("We can delete an item in the middle of the list")
         @Test
         void deletingAnItemInTheMiddleOfTheList() {
@@ -139,7 +133,6 @@ class AddingAndDeletingTodoItemsTest {
             // 1) Add items "Feed the cat", "Walk the dog", "Buy some milk"
             // 2) Delete "Walk the dog"
             // 3) Verify that the list contains "Feed the cat" and "Buy some milk"
-            todoMvcApp.addTodoItems(INITIAL_ITEMS);
             todoMvcApp.deleteTodoItem(WALK_THE_DOG);
 
             assertThat(todoMvcApp.getTodoItems())
@@ -153,7 +146,6 @@ class AddingAndDeletingTodoItemsTest {
             // 1) Add items "Feed the cat", "Walk the dog", "Buy some milk"
             // 2) Delete "Buy some milk"
             // 3) Verify that the list contains "Feed the cat" and "Walk the dog"
-            todoMvcApp.addTodoItems(INITIAL_ITEMS);
             todoMvcApp.deleteTodoItem(BUY_SOME_MILK);
 
             assertThat(todoMvcApp.getTodoItems())
@@ -167,7 +159,6 @@ class AddingAndDeletingTodoItemsTest {
             // 1) Add items "Feed the cat", "Walk the dog", "Buy some milk"
             // 2) Delete "Feed the cat"
             // 3) Verify that the list contains "Walk the dog" and "Buy some milk"
-            todoMvcApp.addTodoItems(INITIAL_ITEMS);
             todoMvcApp.deleteTodoItem(FEED_THE_CAT);
 
             assertThat(todoMvcApp.getTodoItems())
