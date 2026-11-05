@@ -6,7 +6,6 @@ import com.serenitydojo.playwright.fixtures.ChromeHeadlessOptions;
 import com.serenitydojo.playwright.todomvc.pageobjects.TodoMvcAppPage;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -38,7 +37,7 @@ class AddingAndDeletingTodoItemsTest {
         void the_list_should_initially_be_empty() {
             // TODO: Implement me
             // 1) Verify that no items are displayed in the todo list
-            Assertions.assertThat(todoMvcApp.todoItemsDisplayed()).isEmpty();
+            assertThat(todoMvcApp.getTodoItems()).isEmpty();
         }
 
         @DisplayName("The user should be prompted to enter a todo item")
