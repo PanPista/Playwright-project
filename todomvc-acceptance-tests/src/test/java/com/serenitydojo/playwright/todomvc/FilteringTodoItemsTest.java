@@ -4,6 +4,7 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.junit.UsePlaywright;
 import com.serenitydojo.playwright.fixtures.ChromeHeadlessOptions;
 import com.serenitydojo.playwright.todomvc.pageobjects.TodoMvcAppPage;
+import com.serenitydojo.playwright.todomvc.pageobjects.TodoMvcAppPage.Filter;
 import io.qameta.allure.Feature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +34,7 @@ class FilteringTodoItemsTest {
         // TODO: Implement me
         // 1) Add "Feed the cat", "Walk the dog", "Buy some milk"
         // 2) Verify that the active filter is set to "All"
-        assertThat(todoMvcApp.getAllFilterButton()).hasClass("selected");
+        assertThat(todoMvcApp.selectFilter(Filter.ALL)).hasClass("selected");
         assertThat(todoMvcApp.getTodoItems()).hasText(INITIAL_ITEMS);
     }
 
@@ -46,7 +47,7 @@ class FilteringTodoItemsTest {
         // 3) Apply the "Active" filter
         // 4) Verify that only "Feed the cat" and "Buy some milk" are displayed
         todoMvcApp.completeTodoItem(WALK_THE_DOG);
-        todoMvcApp.clickActiveFilterButton();
+        todoMvcApp.filterBy(Filter.ACTIVE);
         assertThat(todoMvcApp.getTodoItems()).hasText(new String[] {FEED_THE_CAT, BUY_SOME_MILK});
     }
 
@@ -59,7 +60,7 @@ class FilteringTodoItemsTest {
         // 3) Apply the "Completed" filter
         // 4) Verify that only "Walk the dog" is displayed
         todoMvcApp.completeTodoItem(WALK_THE_DOG);
-        todoMvcApp.clickCompletedFilterButton();
+        todoMvcApp.filterBy(Filter.COMPLETED);
         assertThat(todoMvcApp.getTodoItems()).hasText(WALK_THE_DOG);
     }
 
@@ -73,8 +74,8 @@ class FilteringTodoItemsTest {
         // 4) Apply the "All" filter
         // 5) Verify that all three items ("Feed the cat", "Walk the dog", "Buy some milk") are displayed
         todoMvcApp.completeTodoItem(WALK_THE_DOG);
-        todoMvcApp.clickCompletedFilterButton();
-        todoMvcApp.clickAllFilterButton();
+        todoMvcApp.filterBy(Filter.COMPLETED);
+        todoMvcApp.filterBy(Filter.ALL);
         assertThat(todoMvcApp.getTodoItems()).hasText(INITIAL_ITEMS);
     }
 }

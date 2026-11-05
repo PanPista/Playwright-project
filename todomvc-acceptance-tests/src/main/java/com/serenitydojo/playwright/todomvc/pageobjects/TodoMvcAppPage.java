@@ -7,15 +7,28 @@ import org.apache.commons.lang3.StringUtils;
 
 public class TodoMvcAppPage {
 
+    public enum Filter {
+        ALL("All"),
+        ACTIVE("Active"),
+        COMPLETED("Completed");
+
+        private final String label;
+
+        Filter(String label) {
+            this.label = label;
+        }
+
+        public String label() {
+            return label;
+        }
+    }
+
     private final Page page;
     private final String baseUrl;
     private final Locator todoItems;
     private final Locator inputField;
     private final Locator todoCount;
     private final Locator clearCompletedButton;
-    private final Locator allFilterButton;
-    private final Locator activeFilterButton;
-    private final Locator completedFilterButton;
 
     public static final String TODO_INPUT_PLACEHOLDER = "What needs to be done?";
 
@@ -27,10 +40,6 @@ public class TodoMvcAppPage {
         inputField = page.getByTestId("text-input");
         todoCount = page.getByTestId("footer").locator(".todo-count");
         clearCompletedButton = page.getByTestId("footer").locator(".clear-completed");
-
-        allFilterButton = page.getByTestId("footer").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("All").setExact(true));
-        activeFilterButton = page.getByTestId("footer").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Active").setExact(true));
-        completedFilterButton = page.getByTestId("footer").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Completed").setExact(true));
     }
 
     public void open() {
@@ -83,18 +92,11 @@ public class TodoMvcAppPage {
         clearCompletedButton.click();
     }
 
-    public Locator getAllFilterButton() {
-        return allFilterButton;
+    public Locator selectFilter(Filter filter) {
+        return page.getByTestId("footer").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName(filter.label()).setExact(true));
     }
 
-    public void clickActiveFilterButton() {
-        activeFilterButton.click();
-    }
-
-    public void clickCompletedFilterButton() {
-        completedFilterButton.click();
-    }
-    public void clickAllFilterButton() {
-        allFilterButton.click();
+    public void filterBy(Filter filter) {
+        selectFilter(filter).click();
     }
 }
