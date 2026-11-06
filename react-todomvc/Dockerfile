@@ -1,20 +1,16 @@
-# Use the official Node.js LTS image
-FROM node:16
-
-# Set the working directory inside the container
+# Build stage: install all dependencies and build the static bundle
+FROM node:20-alpine AS build
 WORKDIR /app
-
-# Copy package.json and package-lock.json
 COPY package*.json ./
-
-# Install Node.js dependencies
-RUN npm install
-
-# Copy the rest of the application code
+RUN npm ci
 COPY . .
+RUN npm run build
 
-# Expose the port that your app runs on
+# Runtime stage: only http-server and the built dist
+FROM node:20-alpine
+WORKDIR /app
+RUN npm install -g http-server && npm cache clean --force
+COPY --from=build /app/dist ./dist
+USER node
 EXPOSE 7002
-
-# Start the Node.js application
-CMD ["npm", "run", "serve"]
+CMD ["http-server", "./dist", "-p", "7002", "-c-1", "--cors"]

@@ -1,44 +1,17 @@
-# Use OpenJDK 17 slim as the base image
-FROM openjdk:17-slim
+FROM maven:3.9.9-eclipse-temurin-17-noble
 
-# Install dependencies
-RUN apt-get update && \
-    apt-get install -y curl zip unzip && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install SDKMAN! and Maven 3.9.9
-RUN curl -s "https://get.sdkman.io" | bash && \
-    bash -c "source $HOME/.sdkman/bin/sdkman-init.sh && \
-             sdk install maven 3.9.9"
-
-# Set Maven environment variables
-ENV MAVEN_HOME /root/.sdkman/candidates/maven/current
-ENV PATH "$MAVEN_HOME/bin:$PATH"
-
-# Verify Maven installation
-RUN mvn -version
-
-# Install curl and update CA certificates
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install Node.js and npm
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
-    apt-get install -y nodejs && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install Playwright dependencies
-RUN npx playwright install-deps
-
-# Test internet connectivity
-RUN curl -I https://repo.maven.apache.org/maven2/
-
-# Set the working directory inside the container
 WORKDIR /tests
 
-# Copy the Maven project files to the container
+# Cache Maven dependencies: copy pom.xml first
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Install only Chromium (the only browser used by the tests) with system deps.
+# Uses the Java CLI so the browser build matches the Playwright version in pom.xml.
+RUN mvn -B -q exec:java -Dexec.mainClass=com.microsoft.playwright.CLI \
+      -Dexec.args="install --with-deps chromium" && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY . .
 
-# Run Maven to execute the tests
-CMD ["mvn", "verify"]
+CMD ["mvn", "verify", "-Dexec.skip=true"]

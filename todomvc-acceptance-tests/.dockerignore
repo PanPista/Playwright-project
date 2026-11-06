@@ -1,0 +1,6 @@
+target/
+.idea/
+.allure/
+.playwright-mcp/
+.DS_Store
+*.log
